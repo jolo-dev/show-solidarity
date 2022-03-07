@@ -3,7 +3,7 @@ import io
 from os import path
 from PIL import Image, ImageDraw, ImageFilter
 import numpy as np
-import cv2
+import face_recognition
 
 
 class SolidarityImage:
@@ -42,23 +42,59 @@ class SolidarityImage:
         """
         Returns an array of faces
         """
-        classifier = path.join(
-            path.dirname(__file__),
-            "haarcascade_frontalface_default.xml",
-        )
-        img = cv2.imread(image_path)
-        cascade = cv2.CascadeClassifier(classifier)
-        faces = cascade.detectMultiScale(
-            img, 1.1, 10, cv2.CASCADE_SCALE_IMAGE, (200, 200)
-        )
-        print(faces)
+        # classifier = path.join(
+        #     path.dirname(__file__),
+        #     "haarcascade_frontalface_default.xml",
+        # )
+        # img = cv2.imread(image_path)
+        # cascade = cv2.CascadeClassifier(classifier)
+        # faces = cascade.detectMultiScale(
+        #     img, 1.1, 10, cv2.CASCADE_SCALE_IMAGE, (200, 200)
+        # )
+        # print(faces)
 
-        for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-            cv2.imwrite(
-                "detected.jpg", img[y - 600 : (y + 2 * 900), x - 400 : (x + 2 * 1000)]
+        # for (x, y, w, h) in faces:
+        #     cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
+        #     cv2.imwrite(
+        #         "detected.jpg", img[y - 600 : (y + 2 * 900), x - 400 : (x + 2 * 1000)]
+        #     )
+        # return faces
+
+        image = face_recognition.load_image_file(image_path)
+
+        # Find all the faces in the image using a pre-trained convolutional neural network.
+        # This method is more accurate than the default HOG model, but it's slower
+        # unless you have an nvidia GPU and dlib compiled with CUDA extensions. But if you do,
+        # this will use GPU acceleration and perform well.
+        # See also: find_faces_in_picture.py
+        face_locations = face_recognition.face_locations(
+            image, number_of_times_to_upsample=0, model="cnn"
+        )
+
+        # print(
+        #     "I found {} face(s) in this photograph. {}".format(
+        #         len(face_locations), face_locations
+        #     )
+        # )
+
+        for face_location in face_locations:
+
+            # Print the location of each face in this image
+            top, right, bottom, left = face_location
+            print(
+                "A face is located at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(
+                    top, left, bottom, right
+                )
             )
-        return faces
+
+            # You can access the actual face itself like this:
+            face_image = image[
+                top - round(top / 4) : bottom + round(bottom / 4),
+                left - round(left / 4) : right + round(right / 4),
+            ]
+            pil_image = Image.fromarray(face_image)
+            pil_image.save("detected.jpg")
+        return face_locations
 
     def mask_circle_solid(self, image: Image):
         """

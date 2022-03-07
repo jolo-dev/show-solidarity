@@ -2,6 +2,10 @@
     "python.formatting.provider": "black",
     "python.linting.enabled": true,
     "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--exclude=*.pyc,.venv/,.pytest_cache/,__pycache__/",
+        "--max-line-length=110"
+    ],
     "python.linting.pylintEnabled": false,
     "python.formatting.blackPath": "black",
     "python.defaultInterpreterPath": ".venv/bin/python",

@@ -1,6 +1,6 @@
 import base64
 from os import path
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image
 
 # from PIL import Image
 import pytest
@@ -30,24 +30,12 @@ def test_base64_encode_image(test_image: SolidarityImage, test_base64_encode: st
 
 def test_detect_face(test_image: SolidarityImage):
     locations = test_image.detect_face(image_path)
-    assert len(locations) == 1  # Because there is just one face
+    assert len(locations) == 1  # Because there should be just one face
 
 
 def test_circle(test_image: SolidarityImage):
-    im: Image = test_image.mask_circle_solid(Image.open("detected.jpg"))
-    # print(im.size)
-    blur_radius = 10
-
-    flag_circle = Image.open("src/ukrainian-flag-circle.png")
-
-    height, width = flag_circle.size
-    im = im.resize((height - 100, width - 100), Image.ANTIALIAS)
-
-    offset = blur_radius * 2
-    mask = Image.new("L", im.size, 0)
-    draw = ImageDraw.Draw(mask)
-    draw.ellipse((offset, offset, im.size[0] - offset, im.size[1] - offset), fill=255)
-    mask = mask.filter(ImageFilter.GaussianBlur(blur_radius))
-
-    flag_circle.paste(im, (50, 50), mask)
-    flag_circle.save("test.png", quality=100)
+    detected = "detected.jpg"
+    test_image.add_background_frame(Image.open(detected))
+    # Should try detect one face on the result.png
+    locations = test_image.detect_face("result.png")
+    assert len(locations) == 1  # Because there should be just one face

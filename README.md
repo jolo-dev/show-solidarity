@@ -14,11 +14,16 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 
 ## Pre-Requisite
 
-**Python:** >= 3.8
+- **Python:** >= 3.8
+- **NodeJS** >= 16.x
+- **[`aws configure`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)**
 
-## Getting Started
+### Tech Stack
 
-Install using `make`
+- AWS CDK with Python
+- Vite + Preact
+
+## Install
 
 ```bash
 make install
@@ -33,6 +38,16 @@ source .venv/bin/activate
 pip install requirements.txt
 ```
 
+## Deploy Infrastructure
+
+This is what your infrastructure will look like
+
+![Infrastructure](.drawio/infrastructure.drawio.svg)
+
+```bash
+CDK_DEFAULT_ACCOUNT=123456789012 CDK_DEFAULT_PROFILE=default make infra
+```
+
 ## Running Tests
 
 To run tests, run the following command
@@ -44,42 +59,6 @@ make test
 ### Test Image
 
 Photo by [Omid Armin](https://unsplash.com/@omidarmin?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText") on [Unsplash]("https://unsplash.com/s/photos/portraits?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText").
-
-## Screenshots
-
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
-
-## Run Locally
-
-Clone the project
-
-```bash
-  git clone https://link-to-project
-```
-
-Go to the project directory
-
-```bash
-  cd my-project
-```
-
-Install dependencies
-
-```bash
-  npm install
-```
-
-Start the server
-
-```bash
-  npm run start
-```
-
-## Optimizations
-
-What optimizations did you make in your code? E.g. refactors, performance improvements, accessibility
-
-![Logo](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/th5xamgrr6se0x5ro4g6.png)
 
 ## License
 
