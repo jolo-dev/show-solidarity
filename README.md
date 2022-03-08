@@ -14,7 +14,7 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 
 ## Pre-Requisite
 
-- **Python:** >= 3.8
+- **Python:** >= 3.8 <= 3.9 (Recommendation: [pyenv](https://github.com/pyenv/pyenv))
 - **NodeJS** >= 16.x
 - **[`aws configure`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)**
 

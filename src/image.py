@@ -3,7 +3,11 @@ import io
 from os import path
 from PIL import Image, ImageDraw, ImageFilter
 import numpy as np
+import boto3
 import face_recognition
+
+rekognition_client = boto3.client("rekognition")
+s3_client = boto3.client("s3")
 
 
 class SolidarityImage:
@@ -38,30 +42,38 @@ class SolidarityImage:
         image = Image.open(buf)
         return image
 
-    def detect_face(self, image_path: str):
+    def read_image_from_s3(self, bucket: str, key: str, region_name="eu-central-1"):
+        """Load image file from s3.
+
+        Parameters
+        ----------
+        bucket: string
+            Bucket name
+        key : string
+            Path in s3
+
+        Returns
+        -------
+        np array
+            Image array
+        """
+        s3 = boto3.resource("s3", region_name)
+        bucket = s3.Bucket(bucket)
+        object = bucket.Object(key)
+        response = object.get()
+        file_stream = response["Body"]
+        im = Image.open(file_stream)
+        return im
+
+    def detect_face_by_path(self, image_path: str):
         """
         Returns an array of faces
         """
-        # classifier = path.join(
-        #     path.dirname(__file__),
-        #     "haarcascade_frontalface_default.xml",
-        # )
-        # img = cv2.imread(image_path)
-        # cascade = cv2.CascadeClassifier(classifier)
-        # faces = cascade.detectMultiScale(
-        #     img, 1.1, 10, cv2.CASCADE_SCALE_IMAGE, (200, 200)
-        # )
-        # print(faces)
-
-        # for (x, y, w, h) in faces:
-        #     cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)
-        #     cv2.imwrite(
-        #         "detected.jpg", img[y - 600 : (y + 2 * 900), x - 400 : (x + 2 * 1000)]
-        #     )
-        # return faces
 
         image = face_recognition.load_image_file(image_path)
-
+        foo = Image.fromarray(image)
+        width, height = foo.size
+        print(width, height)
         # Find all the faces in the image using a pre-trained convolutional neural network.
         # This method is more accurate than the default HOG model, but it's slower
         # unless you have an nvidia GPU and dlib compiled with CUDA extensions. But if you do,
@@ -71,21 +83,54 @@ class SolidarityImage:
             image, number_of_times_to_upsample=0, model="cnn"
         )
 
-        # print(
-        #     "I found {} face(s) in this photograph. {}".format(
-        #         len(face_locations), face_locations
-        #     )
-        # )
-
         for face_location in face_locations:
 
             # Print the location of each face in this image
-            top, right, bottom, left = face_location
+            top_, right_, bottom_, left_ = face_location
+            top = round(height * 0.338)
+            left = round(width * 0.462)
+            bottom = top + round(height * 0.261)
+            right = left + round(width * 0.259)
             print(
                 "A face is located at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(
                     top, left, bottom, right
                 )
             )
+
+            # You can access the actual face itself like this:
+            face_image = image[
+                top - round(top / 4) : bottom + round(bottom / 4),
+                left - round(left / 4) : right + round(right / 4),
+            ]
+            pil_image = Image.fromarray(face_image)
+            pil_image.save("detected.jpg")
+        return face_locations
+
+    def detect_faces(self, bucket: str, key: str):
+        """
+        Returns an array of faces
+        """
+
+        face_locations = rekognition_client.detect_faces(
+            Image={"S3Object": {"Bucket": bucket, "Name": key}}
+        )
+
+        image = self.read_image_from_s3(bucket, key)
+
+        orig_width, orig_height = image.size
+
+        for face in face_locations.FaceDetails:
+
+            # Print the location of each face in this image
+            width = face.BoundingBox.Width
+            height = face.BoundingBox.Height
+            left = face.BoundingBox.Left
+            top = face.BoundingBox.Top
+
+            top = round(orig_height * top)
+            left = round(orig_width * left)
+            bottom = top + round(orig_height * height)
+            right = left + round(orig_width * width)
 
             # You can access the actual face itself like this:
             face_image = image[

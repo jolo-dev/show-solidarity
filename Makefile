@@ -17,10 +17,20 @@ test:
 	$(PYTHON) -m pytest -o log_cli_level=INFO -W ignore::DeprecationWarning -s -v tests
 
 synth:
-	cd infrastructure && npx aws-cdk synth && CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk bootstrap --profile $(CDK_DEFAULT_PROFILE)
+	cd infrastructure \
+	&& npx aws-cdk synth \
+	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk bootstrap --profile $(CDK_DEFAULT_PROFILE)
 
-infra:
-	cd infrastructure && CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk deploy --profile $(CDK_DEFAULT_PROFILE) --require-approval never --outputs-file outputs.json
+lambda:
+	cd src \
+	&& $(VENV_ACTIVATE) \
+	&& pip install -r requirements.txt \
+	&& mv $(VENV)/lib/**/site-packages/** . \
+	&& rm -r .venv pip*
+
+infra: lambda
+	cd infrastructure \
+	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk deploy --profile $(CDK_DEFAULT_PROFILE) --require-approval never --outputs-file outputs.json
 
 destroy_infra:
 	cd infrastructure && npx aws-cdk destroy --force

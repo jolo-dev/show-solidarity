@@ -29,7 +29,7 @@ def test_base64_encode_image(test_image: SolidarityImage, test_base64_encode: st
 
 
 def test_detect_face(test_image: SolidarityImage):
-    locations = test_image.detect_face(image_path)
+    locations = test_image.detect_face_by_path(image_path)
     assert len(locations) == 1  # Because there should be just one face
 
 
@@ -37,5 +37,5 @@ def test_circle(test_image: SolidarityImage):
     detected = "detected.jpg"
     test_image.add_background_frame(Image.open(detected))
     # Should try detect one face on the result.png
-    locations = test_image.detect_face("result.png")
+    locations = test_image.detect_face_by_path("result.png")
     assert len(locations) == 1  # Because there should be just one face
