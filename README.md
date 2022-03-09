@@ -60,6 +60,20 @@ make test
 
 Photo by [Omid Armin](https://unsplash.com/@omidarmin?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText") on [Unsplash]("https://unsplash.com/s/photos/portraits?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText").
 
+## Cleaning
+
+### Destroy Infrastructure
+
+```bash
+make destroy_infra
+```
+
+### Delete Caches and Packages of Lambda
+
+```bash
+make clean
+```
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)

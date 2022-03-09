@@ -9,5 +9,8 @@
     "python.linting.pylintEnabled": false,
     "python.formatting.blackPath": "black",
     "python.defaultInterpreterPath": ".venv/bin/python",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "workbench.editorAssociations": {
+        "*.svg": "hediet.vscode-drawio-text",
+    }
 }
