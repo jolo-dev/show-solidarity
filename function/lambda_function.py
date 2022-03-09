@@ -1,7 +1,7 @@
 from __future__ import print_function
 import json
 import urllib
-from image import SolidarityImage
+from .src.image import SolidarityImage
 
 image = SolidarityImage()
 

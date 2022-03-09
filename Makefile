@@ -2,7 +2,7 @@ VENV := .venv
 PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
 VENV_ACTIVATE=python3 -m venv $(VENV) && . $(VENV)/bin/activate
-REMOVE_LAMBDA_PACKAGE=cd src && rm -r `ls | grep -v "lambda_function.py\|image.py\|__init__.py\|ukrainian-flag-circle.png\|requirements.txt"`
+REMOVE_LAMBDA_PACKAGE=cd src && rm -r `ls | grep -v "lambda_function.py\|src\|requirements.txt"`
 
 # venv is a shortcut target
 venv: $(VENV)/bin/activate

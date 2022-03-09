@@ -4,7 +4,7 @@ from PIL import Image
 
 # from PIL import Image
 import pytest
-from src.image import SolidarityImage
+from function.src.image import SolidarityImage
 
 
 image_path = path.join(path.dirname(__file__), "test-image.jpeg")

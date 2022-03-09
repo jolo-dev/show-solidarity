@@ -1,4 +1,4 @@
-from src.lambda_function import handler
+from function.lambda_function import handler
 import json
 from os import path
 import pytest

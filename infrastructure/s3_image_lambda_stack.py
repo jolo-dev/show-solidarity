@@ -49,7 +49,7 @@ class S3ImageLambdaStack(Stack):
             "ImageLambda",
             runtime=Runtime.PYTHON_3_9,
             handler="lambda_function.handler",
-            code=Code.from_asset(path=path.join(path.dirname(__file__), "../src")),
+            code=Code.from_asset(path=path.join(path.dirname(__file__), "../function")),
             initial_policy=[
                 PolicyStatement(
                     actions=["s3:GetObject"],
