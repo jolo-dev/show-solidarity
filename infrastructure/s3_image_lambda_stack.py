@@ -1,4 +1,4 @@
-from aws_cdk import App, Stack, CfnOutput
+from aws_cdk import App, Stack, CfnOutput, Duration
 from constructs import Construct
 from aws_cdk.aws_s3 import (
     Bucket,
@@ -9,11 +9,9 @@ from aws_cdk.aws_s3 import (
     HttpMethods,
 )
 from aws_cdk.aws_s3_notifications import LambdaDestination
-from aws_cdk.aws_lambda import Function, Runtime, Code
+from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion
 from aws_cdk.aws_iam import PolicyStatement
 from os import path
-
-# from dotenv import set_key
 
 
 app = App()
@@ -47,9 +45,20 @@ class S3ImageLambdaStack(Stack):
         lambda_function = Function(
             self,
             "ImageLambda",
-            runtime=Runtime.PYTHON_3_9,
+            runtime=Runtime.PYTHON_3_8,
             handler="lambda_function.handler",
             code=Code.from_asset(path=path.join(path.dirname(__file__), "../function")),
+            memory_size=512,
+            timeout=Duration.minutes(5),
+            # Lambda Layer for Pillow lib
+            # https://api.klayers.cloud//api/v2/p3.8/layers/latest/eu-central-1/html
+            layers=[
+                LayerVersion.from_layer_version_arn(
+                    self,
+                    "PillowPythonLayer",
+                    "arn:aws:lambda:eu-central-1:770693421928:layer:Klayers-p38-Pillow:1",
+                )
+            ],
             initial_policy=[
                 PolicyStatement(
                     actions=["s3:GetObject"],

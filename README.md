@@ -14,7 +14,7 @@ Add badges from somewhere like: [shields.io](https://shields.io/)
 
 ## Pre-Requisite
 
-- **Python:** >= 3.8 <= 3.9 (Recommendation: [pyenv](https://github.com/pyenv/pyenv))
+- **Python:** 3.8.x ‼️‼️ (Recommendation: [pyenv](https://github.com/pyenv/pyenv))
 - **NodeJS** >= 16.x
 - **[`aws configure`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)**
 
@@ -46,6 +46,19 @@ This is what your infrastructure will look like
 
 ```bash
 CDK_DEFAULT_ACCOUNT=123456789012 CDK_DEFAULT_PROFILE=default make infra
+```
+
+### Lambda Layer
+
+There is a weird issue with Lambda Function and using Pillow library.
+Due to that, the function uses an open layer from [Klayers](https://api.klayers.cloud//api/v2/p3.8/layers/latest/eu-central-1/html).
+Please, consider that the lambda is currently only working with Python 3.8 Runtime.
+Make sure you install that also on your machine.
+As a recommendation, you could use [pyenv](https://github.com/pyenv/pyenv).
+
+```bash
+pyenv install 3.8.12 # or any 3.8.x version
+pyenv local 3.8.12
 ```
 
 ## Running Tests

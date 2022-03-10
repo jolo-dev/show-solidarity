@@ -65,6 +65,7 @@ class SolidarityImage:
     def read_image_from_s3(self, bucket: str, key: str, region_name="eu-central-1"):
         """
         Load image file from s3.
+        Took it from here https://stackoverflow.com/a/56341457
 
         Parameters
         ----------
@@ -84,6 +85,30 @@ class SolidarityImage:
         file_stream = response["Body"]
         im = Image.open(file_stream)
         return im
+
+    def write_image_to_s3(img_array, bucket, key, region_name="eu-central-1"):
+        """
+        Write an image array into S3 bucket
+        Took it from here https://stackoverflow.com/a/56341457
+
+        Parameters
+        ----------
+        bucket: string
+            Bucket name
+        key : string
+            Path in s3
+
+        Returns
+        -------
+        None
+        """
+        s3 = boto3.resource("s3", region_name)
+        bucket = s3.Bucket(bucket)
+        object = bucket.Object(key)
+        file_stream = io.BytesIO()
+        im = Image.fromarray(img_array)
+        im.save(file_stream, format="png")
+        object.put(Body=file_stream.getvalue())
 
     def detect_faces(self, bucket: str, key: str):
         """
@@ -134,8 +159,8 @@ class SolidarityImage:
                 )
             )
             # pil_image = Image.fromarray(face_image)
-            face_image.save("detected.jpg")
-        return face_locations["FaceDetails"]
+            face_image.save("/tmp/detected.jpg")
+        return face_image
 
     def mask_circle_solid(self, image: Image):
         """
@@ -177,4 +202,4 @@ class SolidarityImage:
         mask = mask.filter(ImageFilter.GaussianBlur(self.blur_radius))
 
         self.background_img.paste(img, (50, 50), mask)
-        self.background_img.save("result.png", quality=100)
+        self.background_img.save("/tmp/result.png", quality=100)

@@ -1,8 +1,7 @@
 VENV := .venv
-PYTHON = $(VENV)/bin/python3
+PYTHON = $(VENV)/bin/python3.8
 PIP = $(VENV)/bin/pip
 VENV_ACTIVATE=python3 -m venv $(VENV) && . $(VENV)/bin/activate
-REMOVE_LAMBDA_PACKAGE=cd src && rm -r `ls | grep -v "lambda_function.py\|src\|requirements.txt"`
 
 # venv is a shortcut target
 venv: $(VENV)/bin/activate
@@ -11,7 +10,7 @@ pip_update:
 	$(VENV_ACTIVATE) && $(PIP) install --upgrade pip
 
 install: pip_update venv
-	pip install -r requirements-dev.txt
+	$(PIP) install -r requirements-dev.txt
 	cd website && npm install
 
 test:
@@ -22,17 +21,9 @@ synth:
 	&& npx aws-cdk synth \
 	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk bootstrap --profile $(CDK_DEFAULT_PROFILE)
 
-lambda:
-	cd src \
-	&& $(VENV_ACTIVATE) \
-	&& pip install -r requirements.txt \
-	&& mv $(VENV)/lib/**/site-packages/** . \
-	&& rm -r .venv pip*
-
-infra: lambda
+infra:
 	cd infrastructure \
-	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk deploy --profile $(CDK_DEFAULT_PROFILE) --require-approval never --outputs-file outputs.json \
-	&& cd .. && $(REMOVE_LAMBDA_PACKAGE)
+	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk deploy --profile $(CDK_DEFAULT_PROFILE) --require-approval never --outputs-file outputs.json
 
 destroy_infra:
 	cd infrastructure && npx aws-cdk destroy --force
@@ -47,6 +38,6 @@ website: infra
 all: install synth infra website
 
 clean:
-	rm -rf .pytest_cache **/__pycache__ **/cdk.out && $(REMOVE_LAMBDA_PACKAGE)
+	rm -rf .pytest_cache **/__pycache__ **/cdk.out
 
 .PHONY: install test lint fmt synth clean infra website
