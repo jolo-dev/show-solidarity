@@ -13,4 +13,4 @@ def test_event():
 
 def test_lambda_handler(test_event):
     response = handler(test_event, None)
-    assert response[0]["BoundingBox"] is not None
+    assert response is not None

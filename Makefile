@@ -1,5 +1,5 @@
 VENV := .venv
-PYTHON = $(VENV)/bin/python3.8
+PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
 VENV_ACTIVATE=python3 -m venv $(VENV) && . $(VENV)/bin/activate
 

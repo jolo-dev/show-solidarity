@@ -86,13 +86,17 @@ class SolidarityImage:
         im = Image.open(file_stream)
         return im
 
-    def write_image_to_s3(img_array, bucket, key, region_name="eu-central-1"):
+    def write_image_to_s3(
+        self, img_array: np.array, bucket: str, key: str, region_name="eu-central-1"
+    ):
         """
         Write an image array into S3 bucket
         Took it from here https://stackoverflow.com/a/56341457
 
         Parameters
         ----------
+        img_array: np.array
+            An image array converted to numpy array
         bucket: string
             Bucket name
         key : string
@@ -124,7 +128,7 @@ class SolidarityImage:
 
         Returns
         -------
-        Array of Image Locations
+        An Image
         """
 
         face_locations = rekognition_client.detect_faces(
@@ -203,3 +207,4 @@ class SolidarityImage:
 
         self.background_img.paste(img, (50, 50), mask)
         self.background_img.save("/tmp/result.png", quality=100)
+        return np.array(Image.open("/tmp/result.png"))

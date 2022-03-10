@@ -1,8 +1,7 @@
 import base64
 from os import path
 from PIL import Image
-
-# from PIL import Image
+import numpy as np
 import pytest
 from function.src.image import SolidarityImage
 
@@ -35,7 +34,7 @@ def test_read_image_from_s3(test_image: SolidarityImage):
 
 def test_detect_face(test_image: SolidarityImage):
     locations = test_image.detect_faces("show-solidarity", "test-image.jpeg")
-    assert len(locations) == 1  # Because there should be just one face
+    assert np.array(locations) == np.array(Image.open("/tmp/detected.jpg"))
 
 
 def test_circle(test_image: SolidarityImage):
