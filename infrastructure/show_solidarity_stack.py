@@ -21,7 +21,7 @@ class ShowSolidarityStack(Stack):
             bucket_name=f'result-{kwargs["bucket_name"]}',
         )
 
-        state_machine = StepFunctions(
+        sf = StepFunctions(
             self,
             "SolidarityStateMachine",
             source_bucket=source_bucket.bucket_arn,
@@ -29,5 +29,5 @@ class ShowSolidarityStack(Stack):
         )
 
         StepFunctionsRestApi(
-            self, "StepFunctionRestApi", deploy=True, state_machine=state_machine
+            self, "StepFunctionRestApi", deploy=True, state_machine=sf.state_machine
         )

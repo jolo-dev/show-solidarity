@@ -5,6 +5,10 @@ from aws_cdk.aws_iam import PolicyStatement
 from aws_cdk import Duration
 from os import path
 
+"""
+Bug or wrong usage..
+"""
+
 
 class LambdaFunction(Function):
     def __init__(
@@ -14,13 +18,11 @@ class LambdaFunction(Function):
         handler: str,
         policies: Sequence[PolicyStatement],
     ) -> None:
-        super().__init__(scope, id)
-
-        Function(
-            self,
-            f"{id}ImageLambda",
-            runtime=Runtime.PYTHON_3_8,
+        super().__init__(
+            scope,
+            id,
             handler=handler,
+            runtime=Runtime.PYTHON_3_8,
             code=Code.from_asset(path=path.join(path.dirname(__file__), "../function")),
             memory_size=512,
             timeout=Duration.minutes(5),
@@ -29,7 +31,7 @@ class LambdaFunction(Function):
             layers=[
                 LayerVersion.from_layer_version_arn(
                     self,
-                    "PillowPythonLayer",
+                    f"{id}PillowPythonLayer",
                     "arn:aws:lambda:eu-central-1:770693421928:layer:Klayers-p38-Pillow:1",
                 )
             ],

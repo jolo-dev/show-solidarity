@@ -19,11 +19,11 @@ test:
 synth:
 	cd infrastructure \
 	&& npx aws-cdk synth \
-	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk bootstrap --profile $(CDK_DEFAULT_PROFILE)
+	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk bootstrap
 
-infra:
+infra: venv
 	cd infrastructure \
-	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk deploy --profile $(CDK_DEFAULT_PROFILE) --require-approval never --outputs-file outputs.json
+	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk deploy --require-approval never
 
 destroy_infra:
 	cd infrastructure && npx aws-cdk destroy --force

@@ -13,7 +13,7 @@ app = App()
 
 ShowSolidarityStack(
     app,
-    "S3ImageLambdaStack",
+    "SolidarityImageStack",
     bucket_name=bucket_name,
     env=Environment(
         account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION")

@@ -5,14 +5,28 @@
 
 Due to the current situation, we all need to show Solidarity.
 Show flag 🇺🇦
-
-
-
 ## Pre-Requisite
 
-- **Python:** 3.8.x ‼️‼️ (Recommendation: [pyenv](https://github.com/pyenv/pyenv))
 - **NodeJS** >= 16.x
 - **[`aws configure`](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html)**
+- **Python:** 3.8.x ‼️‼️ (Recommendation: [pyenv](https://github.com/pyenv/pyenv))
+
+<details>
+
+<summary>Using pyenv</summary>
+
+There is a weird issue with Lambda Function and using Pillow library.
+Due to that, the function uses an open layer from [Klayers](https://api.klayers.cloud//api/v2/p3.8/layers/latest/eu-central-1/html).
+Please, consider that the lambda is currently only working with Python 3.8 Runtime.
+Make sure you install that also on your machine.
+As a recommendation, you could use [pyenv](https://github.com/pyenv/pyenv).
+
+```bash
+pyenv install 3.8.12 # or any 3.8.x version
+pyenv local 3.8.12
+```
+
+</details>
 
 ### Tech Stack
 
@@ -38,11 +52,13 @@ source .venv/bin/activate
 pip install requirements.txt
 ```
 
-## Deploy Infrastructure
+## Infrastructure
 
 This is what your infrastructure will look like
 
 ![Infrastructure](.drawio/infrastructure.drawio.svg)
+
+## Deploy Infrastructure
 
 ---
 > **NOTE**
@@ -57,23 +73,28 @@ This is what your infrastructure will look like
 >
 ---
 
+### Synth
+
+`synth` creates Cloudformation in the `infrastructure/cdk.out`.
 
 ```bash
-# Replace the variables with your account
-make infra CDK_DEFAULT_ACCOUNT=123456789012 CDK_DEFAULT_PROFILE=default
+# Replace the variables with your account or leave this
+CDK_DEFAULT_ACCOUNT=$(aws sts get-caller-identity | jq -r ".Account") make synth
 ```
 
-### Lambda Layer
-
-There is a weird issue with Lambda Function and using Pillow library.
-Due to that, the function uses an open layer from [Klayers](https://api.klayers.cloud//api/v2/p3.8/layers/latest/eu-central-1/html).
-Please, consider that the lambda is currently only working with Python 3.8 Runtime.
-Make sure you install that also on your machine.
-As a recommendation, you could use [pyenv](https://github.com/pyenv/pyenv).
+### Deployment
 
 ```bash
-pyenv install 3.8.12 # or any 3.8.x version
-pyenv local 3.8.12
+# Replace the variables with your account or leave this
+CDK_DEFAULT_ACCOUNT=$(aws sts get-caller-identity | jq -r ".Account") make infra
+```
+
+### Troubleshooting
+
+If the `Makefile`- command above not working, please check if you activate `venv`.
+
+```bash
+source .venv/bin/activate
 ```
 
 ## Running Tests
