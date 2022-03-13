@@ -1,7 +1,7 @@
 from aws_cdk import App, Environment
 import os
 
-from s3_image_lambda_stack import S3ImageLambdaStack
+from show_solidarity_stack import ShowSolidarityStack
 
 bucket_name = (
     os.getenv("BUCKET_NAME")
@@ -11,7 +11,7 @@ bucket_name = (
 
 app = App()
 
-S3ImageLambdaStack(
+ShowSolidarityStack(
     app,
     "S3ImageLambdaStack",
     bucket_name=bucket_name,

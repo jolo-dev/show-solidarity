@@ -1,8 +1,7 @@
-from __future__ import print_function
 import json
 from PIL import Image
 import urllib
-from function.src.image import SolidarityImage
+from src.image import SolidarityImage
 
 image = SolidarityImage()
 
@@ -21,8 +20,7 @@ def handler(event, _context):
         # Call rekognition DetectFaces API to detect Text in S3 object.
         response: Image = image.detect_faces(bucket, key)
         img = image.add_background_frame(response)
-        image.write_image_to_s3(img, bucket, "result.png")
-        return response
+        return img
     except Exception as e:
         print(
             "Error processing object {} from bucket {}. Event {}".format(

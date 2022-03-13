@@ -192,6 +192,19 @@ class SolidarityImage:
         return Image.fromarray(final_img_arr)
 
     def add_background_frame(self, image: Image):
+        """
+        Composite the circle image with a blurred circle
+        and save the result in a /tmp/
+
+        Parameters
+        ----------
+        image: Image
+            PIL image
+
+        Returns
+        -------
+        Numpy array of the saved image
+        """
         img: Image = self.mask_circle_solid(image)
         height, width = self.background_img.size
         offset = self.blur_radius * 2
@@ -205,6 +218,7 @@ class SolidarityImage:
         )
         mask = mask.filter(ImageFilter.GaussianBlur(self.blur_radius))
 
+        saved_image = "/tmp/result.png"
         self.background_img.paste(img, (50, 50), mask)
-        self.background_img.save("/tmp/result.png", quality=100)
-        return np.array(Image.open("/tmp/result.png"))
+        self.background_img.save(saved_image, quality=100)
+        return np.array(Image.open(saved_image))

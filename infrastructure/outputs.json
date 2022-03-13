@@ -1,6 +1,0 @@
-{
-  "S3ImageLambdaStack": {
-    "BucketName": "show-solidarity",
-    "LambdaFunctionName": "S3ImageLambdaStack-ImageLambdaE70DA37A-Nx7Rbftc1fr7"
-  }
-}
