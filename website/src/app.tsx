@@ -1,6 +1,6 @@
 import Uppy from '@uppy/core'
 import AwsS3 from '@uppy/aws-s3'
-import { DragDrop, useUppy, ProgressBar } from '@uppy/react'
+import { DragDrop, useUppy, StatusBar } from '@uppy/react'
 import { uploadImage } from './s3client'
 
 
@@ -11,8 +11,27 @@ const bucketName = import.meta.env.VITE_BUCKET_NAME ?? 'show-solidarity'
 
 export function App() {
   const uppy = useUppy( () => {
-    return new Uppy().use( AwsS3, {
+    return new Uppy( { id: 'uppy', autoProceed: true, debug: true } ).use( AwsS3, {
       id: 'AWS S3 Target',
+      getUploadParameters: async ( file ) => {
+        console.log( file );
+
+        const data = await fetch( 'foo.bar', {
+          method: 'post',
+          headers: {
+            accept: 'application/json',
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify( {
+            filename: file.name,
+            contentType: file.type,
+            data: file.data
+          } ),
+        } )
+        return {
+          url: data.url
+        }
+      },
     } ).on( 'file-added', async ( file ) => {
       const reader = new FileReader();
       if ( file ) {
@@ -20,18 +39,23 @@ export function App() {
         reader.onloadend = async () => {
           const base64data = reader.result;
           if ( typeof base64data === 'string' ) {
-            await uploadImage( bucketName, file.name, file.data )
+            const response = await uploadImage( bucketName, file.name, file.data )
+            if ( response.$metadata.httpStatusCode == 200 ) {
+              console.log( 'upload successfull' );
+            }
           }
         };
       }
+    } ).on( 'upload', () => {
+      console.log( 'Upload' );
+    } ).on( 'progress', () => {
+      console.log( 'Progress' );
     } )
   } )
-
-
-
   return (
     <>
       <h1>Show Solidarity 🇺🇦</h1>
+      <img width={400} src='./assets/intro.jpeg' />
       <DragDrop
         width="100%"
         height="100%"
@@ -50,6 +74,13 @@ export function App() {
           },
         }}
       />
+      <StatusBar
+        uppy={uppy}
+        hideUploadButton
+        hideAfterFinish={false}
+        showProgressDetails
+      />
+      Photo by <a href="https://unsplash.com/@kedar9?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Kedar Gadge</a> on <a href="https://unsplash.com/s/photos/ukraine?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
     </>
   )
 }
