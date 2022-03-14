@@ -29,5 +29,8 @@ class ShowSolidarityStack(Stack):
         )
 
         StepFunctionsRestApi(
-            self, "StepFunctionRestApi", deploy=True, state_machine=sf.state_machine
+            self,
+            "StepFunctionRestApi",
+            deploy=True,
+            state_machine=sf.state_machine,
         )

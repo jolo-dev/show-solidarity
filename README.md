@@ -78,15 +78,23 @@ This is what your infrastructure will look like
 `synth` creates Cloudformation in the `infrastructure/cdk.out`.
 
 ```bash
-# Replace the variables with your account or leave this
-CDK_DEFAULT_ACCOUNT=$(aws sts get-caller-identity | jq -r ".Account") make synth
+make synth
+
+# If you need to override the `CDK_DEFAULT_ACCOUNT`
+CDK_DEFAULT_ACCOUNT=123456 make synth
+# or
+export CDK_DEFAULT_ACCOUNT=123456
 ```
 
 ### Deployment
 
 ```bash
-# Replace the variables with your account or leave this
-CDK_DEFAULT_ACCOUNT=$(aws sts get-caller-identity | jq -r ".Account") make infra
+make infra
+
+# If you need to override the `CDK_DEFAULT_ACCOUNT`
+CDK_DEFAULT_ACCOUNT=123456 make synth
+# or
+export CDK_DEFAULT_ACCOUNT=123456
 ```
 
 ### Troubleshooting

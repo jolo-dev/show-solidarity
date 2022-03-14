@@ -1,4 +1,4 @@
-from function.src.image import SolidarityImage
+from src.image import SolidarityImage
 import json
 import numpy as np
 
@@ -9,6 +9,7 @@ def handler(event, _context):
     """
     Uses Rekognition APIs to detect faces for objects uploaded to S3.
     """
+    print(event)
 
     # Get the object from the event.
     bucket = event["bucket_name"]

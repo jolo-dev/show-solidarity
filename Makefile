@@ -19,20 +19,21 @@ test:
 synth:
 	cd infrastructure \
 	&& npx aws-cdk synth \
-	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk bootstrap
+	&& CDK_DEFAULT_ACCOUNT=$(shell aws sts get-caller-identity | jq -r ".Account") npx aws-cdk bootstrap
 
 infra: venv
 	cd infrastructure \
-	&& CDK_DEFAULT_ACCOUNT=$(CDK_DEFAULT_ACCOUNT) npx aws-cdk deploy --require-approval never
+	&& CDK_DEFAULT_ACCOUNT=$(shell aws sts get-caller-identity | jq -r ".Account") npx aws-cdk deploy --require-approval never
 
 destroy_infra:
 	cd infrastructure && npx aws-cdk destroy --force
 
 website: infra
 	cd website && \
-	VITE_BUCKET_NAME=$(shell aws cloudformation describe-stacks --stack-name S3ImageLambdaStack --profile $(CDK_DEFAULT_PROFILE) | jq -r ".Stacks[].Outputs[] | select(.OutputKey==\"BucketName\") | .OutputValue") \
-	VITE_AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID) \
-	VITE_AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY) \
+	VITE_BUCKET_NAME=$(shell aws cloudformation describe-stacks --stack-name SolidarityImageStack | jq -r ".Stacks[].Outputs[] | select(.OutputKey | startswith(\"SourceSolidarityImageBucketBucketName\")) | .OutputValue") \
+	VITE_AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+	VITE_AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
+	VITE_AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
 	npm run dev
 
 all: install synth infra website

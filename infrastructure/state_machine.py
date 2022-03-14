@@ -10,7 +10,7 @@ from constructs import Construct
 from aws_cdk.aws_iam import PolicyStatement
 from aws_cdk.aws_logs import LogGroup
 from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion
-from aws_cdk import Duration
+from aws_cdk import Duration, Stack
 from os import path
 
 
@@ -38,13 +38,18 @@ class StepFunctions(Construct):
             memory_size=512,
             timeout=Duration.minutes(5),
             # Lambda Layer for Pillow lib
-            # https://api.klayers.cloud//api/v2/p3.8/layers/latest/eu-central-1/html
+            # https://api.klayers.cloud//api/v2/p3.8/layers/latest/{Stack.of(self).region}/html
             layers=[
                 LayerVersion.from_layer_version_arn(
                     self,
                     "PutToSourceFunctionPillowPythonLayer",
-                    "arn:aws:lambda:eu-central-1:770693421928:layer:Klayers-p38-Pillow:1",
-                )
+                    f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-Pillow:1",
+                ),
+                LayerVersion.from_layer_version_arn(
+                    self,
+                    "PutToSourceFunctionNumpyPythonLayer",
+                    f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-numpy:1",
+                ),
             ],
         )
 
@@ -74,13 +79,18 @@ class StepFunctions(Construct):
             memory_size=512,
             timeout=Duration.minutes(5),
             # Lambda Layer for Pillow lib
-            # https://api.klayers.cloud//api/v2/p3.8/layers/latest/eu-central-1/html
+            # https://api.klayers.cloud//api/v2/p3.8/layers/latest/{Stack.of(self).region}/html
             layers=[
                 LayerVersion.from_layer_version_arn(
                     self,
                     "RekognitionPillowPythonLayer",
-                    "arn:aws:lambda:eu-central-1:770693421928:layer:Klayers-p38-Pillow:1",
-                )
+                    f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-Pillow:1",
+                ),
+                LayerVersion.from_layer_version_arn(
+                    self,
+                    "RekognitionNumpyPythonLayer",
+                    f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-numpy:1",
+                ),
             ],
         )
 
@@ -107,13 +117,18 @@ class StepFunctions(Construct):
             memory_size=512,
             timeout=Duration.minutes(5),
             # Lambda Layer for Pillow lib
-            # https://api.klayers.cloud//api/v2/p3.8/layers/latest/eu-central-1/html
+            # https://api.klayers.cloud//api/v2/p3.8/layers/latest/{Stack.of(self).region}/html
             layers=[
                 LayerVersion.from_layer_version_arn(
                     self,
                     "PutToResultPillowPythonLayer",
-                    "arn:aws:lambda:eu-central-1:770693421928:layer:Klayers-p38-Pillow:1",
-                )
+                    f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-Pillow:1",
+                ),
+                LayerVersion.from_layer_version_arn(
+                    self,
+                    "PutToResultFunctionNumpyPythonLayer",
+                    f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-numpy:1",
+                ),
             ],
         )
 

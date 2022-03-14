@@ -28,7 +28,7 @@ class SolidarityBucket(Bucket):
             ],
             encryption=BucketEncryption.S3_MANAGED,
             block_public_access=BlockPublicAccess.BLOCK_ALL,
-            **kwargs
+            **kwargs,
         )
 
         CfnOutput(self, "BucketName", value=self.bucket_name)
