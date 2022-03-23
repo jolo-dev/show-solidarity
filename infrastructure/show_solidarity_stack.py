@@ -1,6 +1,11 @@
 from aws_cdk import Stack
 from constructs import Construct
-from aws_cdk.aws_apigateway import StepFunctionsRestApi
+from aws_cdk.aws_apigateway import (
+    StepFunctionsRestApi,
+    StageOptions,
+    MethodLoggingLevel,
+    CorsOptions,
+)
 from solidarity_bucket import SolidarityBucket
 from state_machine import StepFunctions
 
@@ -33,4 +38,20 @@ class ShowSolidarityStack(Stack):
             "StepFunctionRestApi",
             deploy=True,
             state_machine=sf.state_machine,
+            deploy_options=StageOptions(
+                logging_level=MethodLoggingLevel.INFO,
+                caching_enabled=True,
+                data_trace_enabled=True,
+            ),
+            default_cors_preflight_options=CorsOptions(
+                allow_headers=[
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "Authorization",
+                    "X-Api-Key",
+                ],
+                allow_methods=["OPTIONS", "POST"],
+                allow_credentials=True,
+                allow_origins=["http://localhost:3000"],
+            ),
         )

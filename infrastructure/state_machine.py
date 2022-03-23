@@ -23,6 +23,10 @@ class StepFunctions(Construct):
     ) -> None:
         super().__init__(scope, id)
 
+        wait_first = Wait(
+            self, "WaitFirst", time=WaitTime.duration(Duration.seconds(1))
+        )
+
         put_source_function = Function(
             self,
             "PutToSourceFunction",
@@ -58,10 +62,10 @@ class StepFunctions(Construct):
             "PutToSource",
             lambda_function=put_source_function,
             input_path="$.body",
-            output_path="$.payload",
+            result_path="$.source",
         )
 
-        waitX = Wait(self, "WaitXSeconds", time=WaitTime.seconds_path("$.waitSeconds"))
+        waitX = Wait(self, "WaitXSeconds", time=WaitTime.duration(Duration.seconds(1)))
 
         rekognition_function = Function(
             self,
@@ -98,8 +102,7 @@ class StepFunctions(Construct):
             self,
             "Rekognition",
             lambda_function=rekognition_function,
-            input_path="$.payload",
-            output_path="$.output",
+            result_path="$.body",
         )
 
         put_result_function = Function(
@@ -114,7 +117,7 @@ class StepFunctions(Construct):
             ],
             runtime=Runtime.PYTHON_3_8,
             code=Code.from_asset(path=path.join(path.dirname(__file__), "../function")),
-            memory_size=512,
+            memory_size=1024,
             timeout=Duration.minutes(5),
             # Lambda Layer for Pillow lib
             # https://api.klayers.cloud//api/v2/p3.8/layers/latest/{Stack.of(self).region}/html
@@ -136,14 +139,15 @@ class StepFunctions(Construct):
             self,
             "PutToResult",
             lambda_function=put_result_function,
-            input_path="$.output",
-            output_path="$.result",
+            result_path="$",
         )
 
         logGroup = LogGroup(
             self, "SolidarityStepFunctions", log_group_name="SolidarityStepFunctions"
         )
-        definition = put_source.next(waitX).next(rekognition).next(put_result)
+        definition = (
+            wait_first.next(put_source).next(waitX).next(rekognition).next(put_result)
+        )
 
         self.state_machine = StateMachine(
             self,

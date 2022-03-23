@@ -28,9 +28,10 @@ infra: venv
 destroy_infra:
 	cd infrastructure && npx aws-cdk destroy --force
 
-website: infra
+website: venv infra
 	cd website && \
-	VITE_BUCKET_NAME=$(shell aws cloudformation describe-stacks --stack-name SolidarityImageStack | jq -r ".Stacks[].Outputs[] | select(.OutputKey | startswith(\"SourceSolidarityImageBucketBucketName\")) | .OutputValue") \
+	VITE_SOURCE_BUCKET_NAME=$(shell aws cloudformation describe-stacks --stack-name SolidarityImageStack | jq -r ".Stacks[].Outputs[] | select(.OutputKey | startswith(\"SourceSolidarityImageBucketBucketName\")) | .OutputValue") \
+	VITE_RESULT_BUCKET_NAME=$(shell aws cloudformation describe-stacks --stack-name SolidarityImageStack | jq -r ".Stacks[].Outputs[] | select(.OutputKey | startswith(\"ResultSolidarityImageBucketBucketName\")) | .OutputValue") \
 	VITE_AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
 	VITE_AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
 	VITE_AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \

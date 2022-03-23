@@ -23,17 +23,20 @@ def test_image():
 
 
 def test_base64_encode_image(test_image: SolidarityImage, test_base64_encode: str):
+    print(test_base64_encode)
     decoded_image = test_image.decode_img(test_base64_encode)
     assert decoded_image == Image.open(image_path)
 
 
 def test_read_image_from_s3(test_image: SolidarityImage):
-    test_image = test_image.read_image_from_s3("show-solidarity", "test-image.jpeg")
+    test_image = test_image.read_image_from_s3(
+        "source-show-solidarity", "test-image.jpeg"
+    )
     assert test_image is not None
 
 
 def test_detect_face(test_image: SolidarityImage):
-    locations = test_image.detect_faces("show-solidarity", "test-image.jpeg")
+    locations = test_image.detect_faces("source-show-solidarity", "test-image.jpeg")
     assert np.array(locations) == np.array(Image.open("/tmp/detected.jpg"))
 
 

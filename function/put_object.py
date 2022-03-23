@@ -9,10 +9,8 @@ def handler(event, _context):
     """
     Uses Rekognition APIs to detect faces for objects uploaded to S3.
     """
-    print(event)
-
     # Get the object from the event.
-    bucket = event["bucket_name"]
+    bucket = event["bucketName"]
     key = event["key"]
     image_base64 = event["body"]
 
@@ -20,6 +18,10 @@ def handler(event, _context):
         source_image = image.decode_img(image_base64)
         # Call rekognition DetectFaces API to detect Text in S3 object.
         image.write_image_to_s3(np.array(source_image), bucket, key)
+        return {
+            "key": key,
+            "bucketName": bucket,
+        }
 
     except Exception as e:
         print(

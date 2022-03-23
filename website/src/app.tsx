@@ -7,29 +7,41 @@ import { uploadImage } from './s3client'
 import '@uppy/core/dist/style.css'
 import '@uppy/drag-drop/dist/style.css'
 
-const bucketName = import.meta.env.VITE_BUCKET_NAME ?? 'show-solidarity'
+const bucketName = import.meta.env.VITE_SOURCE_BUCKET_NAME
+const resultBucketName = import.meta.env.VITE_RESULT_BUCKET_NAME
+
+// const blobToBase64 = ( blob: Blob | File ) => new Promise<string>( ( resolve, reject ) => {
+//   const reader = new FileReader();
+//   reader.readAsDataURL( blob );
+//   reader.onload = () => ( typeof reader.result === 'string' ) ? resolve( reader.result ) : undefined
+//   reader.onerror = error => reject( error );
+// } );
 
 export function App() {
   const uppy = useUppy( () => {
     return new Uppy( { id: 'uppy', autoProceed: true, debug: true } ).use( AwsS3, {
       id: 'AWS S3 Target',
+      timeout: 600,
       getUploadParameters: async ( file ) => {
-        console.log( file );
+        // const base64Encoded = await blobToBase64( file.data )
+        // const body = base64Encoded.split( ',' )[1]; // to remove the prefix (data type)
 
-        const data = await fetch( 'foo.bar', {
+        const api = await fetch( 'https://s6bwnumkv1.execute-api.eu-central-1.amazonaws.com/prod', {
           method: 'post',
           headers: {
             accept: 'application/json',
             'content-type': 'application/json',
           },
           body: JSON.stringify( {
-            filename: file.name,
+            key: file.name,
             contentType: file.type,
-            data: file.data
+            // body,
+            bucketName,
+            resultBucketName
           } ),
         } )
         return {
-          url: data.url
+          url: api.url
         }
       },
     } ).on( 'file-added', async ( file ) => {

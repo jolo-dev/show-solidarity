@@ -218,7 +218,7 @@ class SolidarityImage:
         )
         mask = mask.filter(ImageFilter.GaussianBlur(self.blur_radius))
 
-        saved_image = "/tmp/result.png"
         self.background_img.paste(img, (50, 50), mask)
-        self.background_img.save(saved_image, quality=100)
-        return np.array(Image.open(saved_image))
+        buffer = io.BytesIO()
+        self.background_img.save(buffer, format="PNG", quality=100)
+        return buffer.getvalue()

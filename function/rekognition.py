@@ -1,7 +1,8 @@
 import json
 from PIL import Image
-import urllib
 from src.image import SolidarityImage
+import base64
+
 
 image = SolidarityImage()
 
@@ -13,14 +14,20 @@ def handler(event, _context):
     """
 
     # Get the object from the event.
-    bucket = event["Records"][0]["s3"]["bucket"]["name"]
-    key = urllib.parse.unquote_plus(event["Records"][0]["s3"]["object"]["key"])
-
+    bucket = event["source"]["Payload"]["bucketName"]
+    key = event["source"]["Payload"]["key"]
+    result_bucket = event["body"]["resultBucketName"]
+    print(bucket, key, result_bucket)
     try:
         # Call rekognition DetectFaces API to detect Text in S3 object.
         response: Image = image.detect_faces(bucket, key)
         img = image.add_background_frame(response)
-        return img
+        print(response, base64.b64encode(img))
+        return {
+            "body": base64.b64encode(img),
+            "bucketName": result_bucket,
+            "key": key,
+        }
     except Exception as e:
         print(
             "Error processing object {} from bucket {}. Event {}".format(
