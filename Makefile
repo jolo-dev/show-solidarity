@@ -23,9 +23,9 @@ synth:
 
 infra: venv
 	cd infrastructure \
-	&& CDK_DEFAULT_ACCOUNT=$(shell aws sts get-caller-identity | jq -r ".Account") npx aws-cdk deploy --require-approval never
+	&& CDK_DEFAULT_ACCOUNT=$(shell aws sts get-caller-identity --profile jolo | jq -r ".Account") npx aws-cdk deploy --profile jolo --require-approval never
 
-destroy_infra:
+destroy_infra: venv
 	cd infrastructure && npx aws-cdk destroy --force
 
 website: venv infra

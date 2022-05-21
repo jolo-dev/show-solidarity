@@ -1,7 +1,7 @@
 import Uppy from '@uppy/core'
 import AwsS3 from '@uppy/aws-s3'
 import { DragDrop, useUppy, StatusBar } from '@uppy/react'
-import { uploadImage } from './s3client'
+// import { uploadImage } from './s3client'
 
 
 import '@uppy/core/dist/style.css'
@@ -51,10 +51,10 @@ export function App() {
         reader.onloadend = async () => {
           const base64data = reader.result;
           if ( typeof base64data === 'string' ) {
-            const response = await uploadImage( bucketName, file.name, file.data )
-            if ( response.$metadata.httpStatusCode == 200 ) {
-              console.log( 'upload successfull' );
-            }
+            // const response = await uploadImage( bucketName, file.name, file.data )
+            // if ( response.$metadata.httpStatusCode == 200 ) {
+            //   console.log( 'upload successfull' );
+            // }
           }
         };
       }
@@ -66,33 +66,52 @@ export function App() {
   } )
   return (
     <>
-      <h1>Show Solidarity 🇺🇦</h1>
-      <img width={400} src='./assets/intro.jpeg' />
-      <DragDrop
-        width="100%"
-        height="100%"
-        note="Better result when at least 800×800px"
-        // assuming `this.uppy` contains an Uppy instance:
-        uppy={uppy}
-        onDrop={() => { console.log( uppy.getFiles()[0].data ) }}
-        locale={{
-          strings: {
-            // Text to show on the droppable area.
-            // `%{browse}` is replaced with a link that opens the system file selection dialog.
-            dropHereOr: 'Drop here or %{browse}',
-            // Used as the label for the link that opens the system file selection dialog.
-            browse: 'browse',
+      <section className="relative flex flex-wrap lg:h-screen lg:items-center">
+        <div className="w-full px-4 py-12 lg:w-1/2 sm:px-6 lg:px-8 sm:py-16 lg:py-24">
+          <div className="max-w-lg mx-auto text-center">
+            <h1 className="text-2xl font-bold sm:text-3xl">Show Solidarity!</h1>
 
-          },
-        }}
-      />
-      <StatusBar
-        uppy={uppy}
-        hideUploadButton
-        hideAfterFinish={false}
-        showProgressDetails
-      />
-      Photo by <a href="https://unsplash.com/@kedar9?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Kedar Gadge</a> on <a href="https://unsplash.com/s/photos/ukraine?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+            <p className="mt-4 text-gray-500" >
+              Show Solidarity with Ukraine to your Social Media profile picture and be against Russian aggression.
+            </p >
+          </div >
+
+          <DragDrop
+            width="100%"
+            height="100%"
+            note="Better result when at least 800×800px"
+            // assuming `this.uppy` contains an Uppy instance:
+            uppy={uppy}
+            onDrop={() => { console.log( uppy.getFiles()[0].data ) }}
+            locale={{
+              strings: {
+                // Text to show on the droppable area.
+                // `%{browse}` is replaced with a link that opens the system file selection dialog.
+                dropHereOr: 'Drop here or %{browse}',
+                // Used as the label for the link that opens the system file selection dialog.
+                browse: 'browse',
+
+              },
+            }}
+          />
+
+        </div >
+
+        <div className="relative w-full h-64 sm:h-96 lg:w-1/2 lg:h-full" >
+          <img
+            className="absolute inset-0 w-full h-full"
+            src="./assets/intro.jpeg"
+            alt="peace"
+          />
+          <StatusBar
+            uppy={uppy}
+            hideUploadButton
+            hideAfterFinish={false}
+            showProgressDetails
+          />
+          Photo by <a href="https://unsplash.com/@kedar9?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText"> Kedar Gadge</a> on <a href="https://unsplash.com/s/photos/ukraine?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText" > Unsplash</a>
+        </div >
+      </section >
     </>
   )
 }
