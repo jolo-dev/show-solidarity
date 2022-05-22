@@ -35,7 +35,7 @@ pyenv local 3.8.12
 - AWS Lambda
 - Amazon Rekognition
 - AWS CDK with Python
-- Vite + Preact
+- Vite + React
 
 ## Install
 
