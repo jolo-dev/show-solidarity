@@ -100,7 +100,7 @@ export function App() {
         <div className="relative w-full h-64 sm:h-96 lg:w-1/2 lg:h-full" >
           <img
             className="absolute inset-0 w-full h-full"
-            src="./assets/intro.jpeg"
+            src="./intro.jpeg"
             alt="peace"
           />
           <StatusBar
