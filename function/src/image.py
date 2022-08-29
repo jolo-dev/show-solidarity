@@ -111,7 +111,9 @@ class SolidarityImage:
         object = bucket.Object(key)
         file_stream = io.BytesIO()
         im = Image.fromarray(img_array)
-        im.save(file_stream, format="png")
+        im.save(
+            file_stream, format="png"
+        )  # Store in PNG because it supports transparency
         object.put(Body=file_stream.getvalue())
 
     def detect_faces(self, bucket: str, key: str):

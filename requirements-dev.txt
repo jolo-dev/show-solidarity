@@ -5,3 +5,4 @@ flake8==4.0.1
 pytest==7.0.1
 aws-cdk-lib==2.15.0
 boto3==1.21.13
+moto[rekognition,s3]==4.0.1

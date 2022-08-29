@@ -1,13 +1,22 @@
 from aws_cdk import Stack
 from constructs import Construct
-from aws_cdk.aws_apigateway import (
+from aws_cdk import (
     StepFunctionsRestApi,
     StageOptions,
     MethodLoggingLevel,
     CorsOptions,
+    LambdaDestination,
+    NotificationKeyFilter,
+    Function,
+    PolicyStatement,
+    Runtime,
+    LayerVersion,
+    Code,
+    Duration,
 )
 from solidarity_bucket import SolidarityBucket
 from state_machine import StepFunctions
+from os import path
 
 
 class ShowSolidarityStack(Stack):
@@ -17,13 +26,59 @@ class ShowSolidarityStack(Stack):
         source_bucket = SolidarityBucket(
             self,
             "SourceSolidarityImageBucket",
-            bucket_name=f'source-{kwargs["bucket_name"]}',
+        )
+
+        rekognition_function = Function(
+            self,
+            "RekognitionFunction",
+            handler="rekognition.handler",
+            initial_policy=[
+                PolicyStatement(
+                    actions=["s3:GetObject", "s3:ListBucket", "s3:PutObject"],
+                    resources=[source_bucket, f"{source_bucket}/*"],
+                ),
+                PolicyStatement(actions=["rekognition:DetectFaces"], resources=["*"]),
+            ],
+            runtime=Runtime.PYTHON_3_8,
+            code=Code.from_asset(path=path.join(path.dirname(__file__), "../function")),
+            memory_size=512,
+            timeout=Duration.minutes(5),
+            # Lambda Layer for Pillow lib
+            # https://api.klayers.cloud//api/v2/p3.8/layers/latest/{Stack.of(self).region}/html
+            layers=[
+                LayerVersion.from_layer_version_arn(
+                    self,
+                    "RekognitionPillowPythonLayer",
+                    f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-Pillow:1",
+                ),
+                LayerVersion.from_layer_version_arn(
+                    self,
+                    "RekognitionNumpyPythonLayer",
+                    f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-numpy:1",
+                ),
+            ],
+        )
+
+        # Create trigger for Lambda function using suffix
+        notification = LambdaDestination(rekognition_function)
+        notification.bind(self, source_bucket)
+        # Add Create Event only for .jpg files
+        source_bucket.add_object_created_notification(
+            notification, NotificationKeyFilter(suffix=".jpg")
+        )
+        # Add Create Event only for .png files
+        source_bucket.add_object_created_notification(
+            notification, NotificationKeyFilter(suffix=".png")
+        )
+
+        # Add Create Event only for .jpeg files
+        source_bucket.add_object_created_notification(
+            notification, NotificationKeyFilter(suffix=".jpeg")
         )
 
         result_bucket = SolidarityBucket(
             self,
             "ResultSolidarityImageBucket",
-            bucket_name=f'result-{kwargs["bucket_name"]}',
         )
 
         sf = StepFunctions(

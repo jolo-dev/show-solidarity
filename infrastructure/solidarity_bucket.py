@@ -1,4 +1,4 @@
-from aws_cdk import CfnOutput
+from aws_cdk import CfnOutput, RemovalPolicy
 from aws_cdk.aws_s3 import (
     Bucket,
     BucketEncryption,
@@ -17,17 +17,30 @@ class SolidarityBucket(Bucket):
             cors=[
                 CorsRule(
                     allowed_methods=[
+                        HttpMethods.GET,
                         HttpMethods.PUT,
                         HttpMethods.POST,
-                        HttpMethods.DELETE,
+                    ],
+                    allowed_origins=["http://localhost:3000"],
+                    allowed_headers=[
+                        "Authorization",
+                        "x-amz-date",
+                        "x-amz-content-sha256",
+                        "content-type",
+                    ],
+                    max_age=3000,
+                ),
+                CorsRule(
+                    allowed_methods=[
+                        HttpMethods.GET,
                     ],
                     allowed_origins=["*"],
-                    allowed_headers=["*"],
                     max_age=3000,
-                )
+                ),
             ],
             encryption=BucketEncryption.S3_MANAGED,
             block_public_access=BlockPublicAccess.BLOCK_ALL,
+            removal_policy=RemovalPolicy.DESTROY,
             **kwargs,
         )
 

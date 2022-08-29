@@ -2,6 +2,7 @@ import json
 from PIL import Image
 from src.image import SolidarityImage
 import base64
+import numpy as np
 
 
 image = SolidarityImage()
@@ -22,7 +23,8 @@ def handler(event, _context):
         # Call rekognition DetectFaces API to detect Text in S3 object.
         response: Image = image.detect_faces(bucket, key)
         img = image.add_background_frame(response)
-        print(response, base64.b64encode(img))
+        print(response, np.array(base64.b64encode(img)))
+        image.write_image_to_s3(np.array(img), result_bucket, key)
         return {
             "body": base64.b64encode(img),
             "bucketName": result_bucket,
