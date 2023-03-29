@@ -1,0 +1,27 @@
+---
+export interface Props {
+  title: string
+  img: string
+}
+
+const { title, img } = Astro.props
+---
+
+<style>
+  a {
+    text-decoration: underline;
+    color: blue;
+  }
+</style>
+
+<div
+  style={'background-image: url("' + img + '")'}
+  class='back-img h-screen bg-cover bg-fixed snap-start'
+>
+  <div class='flex h-parallax flex-col place-items-center justify-center'>
+    <slot />
+  </div>
+  <div class='flex justify-end place-items-end w-parallax'>
+    <div class='text-white text-xs thanks' set:html={title} />
+  </div>
+</div>

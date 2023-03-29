@@ -69,7 +69,7 @@ class StepFunctions(Construct):
 
         create_pre_signed_url_function = Function(
             self,
-            "PutToSourceFunction",
+            "CreatePreSignedUrlFunction",
             handler="put_object.handler",
             initial_policy=[
                 PolicyStatement(
@@ -87,7 +87,7 @@ class StepFunctions(Construct):
             self,
             "Rekognition",
             lambda_function=create_pre_signed_url_function,
-            result_path="$.body",
+            result_path="$$.Task.Token",
         )
 
         logGroup = LogGroup(

@@ -3,6 +3,7 @@ from PIL import Image
 from src.image import SolidarityImage
 import base64
 import numpy as np
+import io
 
 
 image = SolidarityImage()
@@ -14,16 +15,18 @@ def handler(event, _context):
     Uses Rekognition APIs to detect faces for objects uploaded to S3.
     """
 
+    print(event["Records"])
     # Get the object from the event.
-    bucket = event["source"]["Payload"]["bucketName"]
-    key = event["source"]["Payload"]["key"]
-    result_bucket = event["body"]["resultBucketName"]
-    print(bucket, key, result_bucket)
+    bucket = event["Records"][0]["s3"]["bucket"]["name"]
+    key = event["Records"][0]["s3"]["object"]["key"]
+    result_bucket = "solidarityimagestack-resultsolidarityimagebucket1-1fydr16r11ag"
     try:
         # Call rekognition DetectFaces API to detect Text in S3 object.
         response: Image = image.detect_faces(bucket, key)
-        img = image.add_background_frame(response)
-        print(response, np.array(base64.b64encode(img)))
+        img_array = image.add_background_frame(response)
+        file_stream = io.BytesIO(img_array)
+        img = Image.open(file_stream)
+        img.save(f"/tmp/${key}.jpg", format="png")
         image.write_image_to_s3(np.array(img), result_bucket, key)
         return {
             "body": base64.b64encode(img),

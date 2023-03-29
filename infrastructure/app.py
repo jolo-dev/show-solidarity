@@ -3,18 +3,11 @@ import os
 
 from show_solidarity_stack import ShowSolidarityStack
 
-bucket_name = (
-    os.getenv("BUCKET_NAME")
-    if os.getenv("BUCKET_NAME") is not None
-    else "show-solidarity"
-)
-
 app = App()
 
 ShowSolidarityStack(
     app,
     "SolidarityImageStack",
-    bucket_name=bucket_name,
     env=Environment(
         account=os.getenv("CDK_DEFAULT_ACCOUNT"), region=os.getenv("CDK_DEFAULT_REGION")
     ),

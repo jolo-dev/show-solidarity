@@ -1,0 +1,135 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Parallax from '../components/Parallax.astro'
+import { Uploader } from '../components/Uppy.tsx'
+
+// One day Time in ms (milliseconds)
+var one_day = 1000 * 60 * 60 * 24
+
+// To set present_dates to two variables
+var today = new Date()
+
+// 0-11 is Month in JavaScript
+var dayOneOfUkraineAttack = new Date(2022, 1, 24)
+
+// To Calculate the result in milliseconds and then converting into days
+var Result =
+  Math.round(dayOneOfUkraineAttack.getTime() - today.getTime()) / one_day
+
+// To remove the decimals from the (Result) resulting days value
+var daysOfUkrainianWar = (-1 * (Result - 1)).toFixed(0)
+---
+
+<Layout title='Show Solidarity to Ukraine - Iran'>
+  <main class='snap-y snap-mandatory h-screen w-screen mx:auto overflow-scroll'>
+    <Parallax
+      img='https://images.unsplash.com/photo-1636017425094-51ed855901a7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2950&q=80'
+      title='Photo by <a class="underline" href="https://unsplash.com/@markusspiske?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Markus Spiske</a> on <a class="underline" href="https://unsplash.com/s/photos/solidarity?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>'
+    >
+      <h1 class='text-center text-zinc-200'>
+        Show <span class='text-gradient hover:drop-shadow-3xl'>Solidarity</span>
+      </h1>
+      <p>In these days, it is even more important to show solidarity.</p>
+    </Parallax>
+    <Parallax
+      img='https://images.unsplash.com/photo-1641555203179-afb3549b2fcc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80'
+      title='Photo by <a class="underline" href="https://unsplash.com/@ykhomi?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Yura Khomitskyi</a> on <a class="underline" href="https://unsplash.com/s/photos/ukraine?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>'
+    >
+      <h1 class='text-center text-sky-700 shadow-lg'>
+        <span class='text-gradient-to-r from-cyan-500 to-yellow-500'
+          >Ukraine</span
+        >
+      </h1>
+      <p class='bg-sky-50/50 p-1'>
+        In these days, it is even more important to show solidarity.
+      </p>
+    </Parallax>
+    <div
+      class='flex gap-5 justify-center items-center w-2/3 h-screen m-auto snap-start'
+    >
+      <p>
+        Since 24th of Februar, Russia attacks the Ukraine. That are <span
+          class='text-gradient text-2xl'>{daysOfUkrainianWar}</span
+        > days of consistent attacks by a Russian aggressor.
+      </p>
+      <p>
+        <div>
+          <iframe
+            src='https://player.vimeo.com/video/699171058?h=c694bcee5e&color=ffffff&byline=0&portrait=0'
+            width='640'
+            height='360'
+            frameborder='0'
+            allow='autoplay; fullscreen; picture-in-picture'
+            allowfullscreen></iframe>
+          <p>
+            <a class='underline' href='https://vimeo.com/699171058'
+              >BORN NOT FOR WAR! UKRAINE 2022</a
+            > from <a href='https://vimeo.com/chofilms'>CHO.FILMS</a> on <a
+              href='https://vimeo.com'>Vimeo</a
+            >.
+          </p>
+        </div>
+      </p>
+    </div>
+    <div
+      class='flex flex-col gap-5 justify-center items-center w-2/3 h-screen m-auto snap-start'
+    >
+      Upload your image and it will recognize the faces and puts its solidarity.
+      <Uploader client:only='react' />
+    </div>
+    <Parallax
+      img='https://images.unsplash.com/photo-1665008804550-1995c88254fd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80'
+      title='Photo by <a class="underline" href="https://unsplash.com/@albertshere?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Albert Stoynov</a> on <a class="underline" href="https://unsplash.com/s/photos/iran-protests?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>'
+    >
+      <h1 class='text-center text-zinc-200'>
+        Show <span class='text-gradient'>Solidarity</span>
+      </h1>
+      <p>In these days, it is even more important to show solidarity.</p>
+    </Parallax>
+    <div class='max-w-lg m-auto snap-start'>
+      <p class='mb-4'>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec placerat
+        a magna non varius. Proin leo felis, euismod non porta eget, varius sit
+        amet sapien. Maecenas in nulla at leo convallis consectetur id a sapien.
+        Nulla nec pulvinar nisi. Vivamus non facilisis lacus, et volutpat
+        libero. Nulla ac odio aliquam, accumsan arcu ut, lacinia est. Nulla eu
+        sem elit. Fusce nec laoreet sem, semper molestie libero.
+      </p>
+      <p class='mb-4'>
+        Ut sagittis lacus consequat accumsan venenatis. Sed sollicitudin, lectus
+        et fringilla ultrices, dolor nisi scelerisque tortor, vel finibus magna
+        massa non nunc. Phasellus massa quam, egestas a nisl sed, porta volutpat
+        metus. Nunc sed elit ac tellus tempor cursus. Suspendisse potenti.
+        Vestibulum varius rutrum nisl nec consequat. Suspendisse semper
+        dignissim sem viverra semper. Nulla porttitor, purus nec accumsan
+        pharetra, nisi dolor condimentum ipsum, id consequat nulla nunc in
+        ligula.
+      </p>
+      <p class='mb-12'>
+        Nulla pharetra lacinia nisi, vitae mollis tellus euismod id. Mauris
+        porta dignissim hendrerit. Cras id velit varius, fermentum lectus vitae,
+        ultricies dolor. In bibendum rhoncus purus vel rutrum. Nam vulputate
+        imperdiet fringilla. Donec blandit libero massa. Suspendisse dictum diam
+        mauris, vitae fermentum dolor tincidunt in. Pellentesque sollicitudin
+        venenatis dolor, vitae scelerisque elit ultrices eu. Donec eget sodales
+        risus, quis dignissim neque.
+      </p>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    text-shadow: 1px 1px 2px black;
+  }
+  .text-gradient {
+    background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 400%;
+    background-position: 0%;
+  }
+</style>

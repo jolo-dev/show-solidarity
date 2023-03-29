@@ -11,31 +11,28 @@ pip_update:
 
 install: pip_update venv
 	$(PIP) install -r requirements-dev.txt
-	cd website && npm install
+	cd website && pnpm install
 
 test:
 	$(PYTHON) -m pytest -o log_cli_level=INFO -W ignore::DeprecationWarning -s -v tests
 
-synth:
+synth: venv
 	cd infrastructure \
-	&& npx aws-cdk synth \
-	&& CDK_DEFAULT_ACCOUNT=$(shell aws sts get-caller-identity | jq -r ".Account") npx aws-cdk bootstrap
+	&& npx aws-cdk synth --profile $(AWS_PROFILE) \
+	&& CDK_DEFAULT_ACCOUNT=$(shell aws sts get-caller-identity --profile $$AWS_PROFILE | jq -r ".Account") npx aws-cdk bootstrap --profile $(AWS_PROFILE)
 
 infra: venv
 	cd infrastructure \
-	&& CDK_DEFAULT_ACCOUNT=$(shell aws sts get-caller-identity --profile jolo | jq -r ".Account") npx aws-cdk deploy --profile jolo --require-approval never
+	&& CDK_DEFAULT_ACCOUNT=$(shell aws sts get-caller-identity --profile $$AWS_PROFILE | jq -r ".Account") npx aws-cdk deploy --profile $(AWS_PROFILE) --require-approval never
 
 destroy_infra: venv
 	cd infrastructure && npx aws-cdk destroy --force
 
 website: venv infra
 	cd website && \
-	VITE_SOURCE_BUCKET_NAME=$(shell aws cloudformation describe-stacks --stack-name SolidarityImageStack | jq -r ".Stacks[].Outputs[] | select(.OutputKey | startswith(\"SourceSolidarityImageBucketBucketName\")) | .OutputValue") \
-	VITE_RESULT_BUCKET_NAME=$(shell aws cloudformation describe-stacks --stack-name SolidarityImageStack | jq -r ".Stacks[].Outputs[] | select(.OutputKey | startswith(\"ResultSolidarityImageBucketBucketName\")) | .OutputValue") \
-	VITE_AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
-	VITE_AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY} \
-	VITE_AWS_SESSION_TOKEN=${AWS_SESSION_TOKEN} \
-	npm run dev
+	VITE_SOURCE_BUCKET_NAME=$(shell aws cloudformation --profile $$AWS_PROFILE describe-stacks --stack-name SolidarityImageStack | jq -r ".Stacks[].Outputs[] | select(.OutputKey | startswith(\"SourceSolidarityImageBucketBucketName\")) | .OutputValue") \
+	VITE_RESULT_BUCKET_NAME=$(shell aws cloudformation --profile $$AWS_PROFILE describe-stacks --stack-name SolidarityImageStack | jq -r ".Stacks[].Outputs[] | select(.OutputKey | startswith(\"ResultSolidarityImageBucketBucketName\")) | .OutputValue") \
+	pnpm run dev
 
 all: install synth infra website
 

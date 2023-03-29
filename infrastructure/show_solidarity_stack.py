@@ -1,17 +1,11 @@
 from aws_cdk import Stack
 from constructs import Construct
 from aws_cdk import (
-    StepFunctionsRestApi,
-    StageOptions,
-    MethodLoggingLevel,
-    CorsOptions,
-    LambdaDestination,
-    NotificationKeyFilter,
-    Function,
-    PolicyStatement,
-    Runtime,
-    LayerVersion,
-    Code,
+    aws_apigateway as api,
+    aws_lambda as lamb,
+    aws_iam as iam,
+    aws_s3 as s3,
+    aws_s3_notifications as s3_event,
     Duration,
 )
 from solidarity_bucket import SolidarityBucket
@@ -28,30 +22,42 @@ class ShowSolidarityStack(Stack):
             "SourceSolidarityImageBucket",
         )
 
-        rekognition_function = Function(
+        result_bucket = SolidarityBucket(
+            self,
+            "ResultSolidarityImageBucket",
+        )
+
+        rekognition_function = lamb.Function(
             self,
             "RekognitionFunction",
             handler="rekognition.handler",
             initial_policy=[
-                PolicyStatement(
-                    actions=["s3:GetObject", "s3:ListBucket", "s3:PutObject"],
-                    resources=[source_bucket, f"{source_bucket}/*"],
+                # iam.PolicyStatement(
+                #     actions=["s3:GetObject", "s3:ListBucket"],
+                #     resources=[
+                #         source_bucket.bucket_arn,
+                #         f"{source_bucket.bucket_arn}/*",
+                #     ],
+                # ),
+                iam.PolicyStatement(
+                    actions=["rekognition:DetectFaces"], resources=["*"]
                 ),
-                PolicyStatement(actions=["rekognition:DetectFaces"], resources=["*"]),
             ],
-            runtime=Runtime.PYTHON_3_8,
-            code=Code.from_asset(path=path.join(path.dirname(__file__), "../function")),
+            runtime=lamb.Runtime.PYTHON_3_8,
+            code=lamb.Code.from_asset(
+                path=path.join(path.dirname(__file__), "../function")
+            ),
             memory_size=512,
             timeout=Duration.minutes(5),
             # Lambda Layer for Pillow lib
             # https://api.klayers.cloud//api/v2/p3.8/layers/latest/{Stack.of(self).region}/html
             layers=[
-                LayerVersion.from_layer_version_arn(
+                lamb.LayerVersion.from_layer_version_arn(
                     self,
                     "RekognitionPillowPythonLayer",
                     f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-Pillow:1",
                 ),
-                LayerVersion.from_layer_version_arn(
+                lamb.LayerVersion.from_layer_version_arn(
                     self,
                     "RekognitionNumpyPythonLayer",
                     f"arn:aws:lambda:{Stack.of(self).region}:770693421928:layer:Klayers-p38-numpy:1",
@@ -59,26 +65,23 @@ class ShowSolidarityStack(Stack):
             ],
         )
 
+        source_bucket.grant_read(rekognition_function)
+        result_bucket.grant_put(rekognition_function)
+
         # Create trigger for Lambda function using suffix
-        notification = LambdaDestination(rekognition_function)
+        notification = s3_event.LambdaDestination(rekognition_function)
         notification.bind(self, source_bucket)
         # Add Create Event only for .jpg files
         source_bucket.add_object_created_notification(
-            notification, NotificationKeyFilter(suffix=".jpg")
+            notification, s3.NotificationKeyFilter(suffix=".jpg")
         )
         # Add Create Event only for .png files
         source_bucket.add_object_created_notification(
-            notification, NotificationKeyFilter(suffix=".png")
+            notification, s3.NotificationKeyFilter(suffix=".png")
         )
-
         # Add Create Event only for .jpeg files
         source_bucket.add_object_created_notification(
-            notification, NotificationKeyFilter(suffix=".jpeg")
-        )
-
-        result_bucket = SolidarityBucket(
-            self,
-            "ResultSolidarityImageBucket",
+            notification, s3.NotificationKeyFilter(suffix=".jpeg")
         )
 
         sf = StepFunctions(
@@ -88,17 +91,17 @@ class ShowSolidarityStack(Stack):
             result_bucket=result_bucket.bucket_arn,
         )
 
-        StepFunctionsRestApi(
+        api.StepFunctionsRestApi(
             self,
             "StepFunctionRestApi",
             deploy=True,
             state_machine=sf.state_machine,
-            deploy_options=StageOptions(
-                logging_level=MethodLoggingLevel.INFO,
+            deploy_options=api.StageOptions(
+                logging_level=api.MethodLoggingLevel.INFO,
                 caching_enabled=True,
                 data_trace_enabled=True,
             ),
-            default_cors_preflight_options=CorsOptions(
+            default_cors_preflight_options=api.CorsOptions(
                 allow_headers=[
                     "Content-Type",
                     "X-Amz-Date",

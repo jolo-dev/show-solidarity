@@ -22,7 +22,7 @@ class LambdaFunction(Function):
             scope,
             id,
             handler=handler,
-            runtime=Runtime.PYTHON_3_8,
+            runtime=Runtime.PYTHON_3_9,
             code=Code.from_asset(path=path.join(path.dirname(__file__), "../function")),
             memory_size=512,
             timeout=Duration.minutes(5),
